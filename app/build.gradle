@@ -35,9 +35,12 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-database:1.1.1'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
     compile 'com.squareup.picasso:picasso:2.71828'
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:design:26.+'
+    testCompile 'junit:junit:4.12'
 }
+
+
+
 
 
 

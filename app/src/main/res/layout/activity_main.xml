@@ -8,11 +8,15 @@
     tools:context="com.example.shivr.androidblogapp.MainActivity">
 
 
+    <include
+        android:id="@+id/main_tool_bar"
+        layout="@layout/app_bar_layout" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/blog_list_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/main_tool_bar">
 
     </android.support.v7.widget.RecyclerView>
 

@@ -2,9 +2,11 @@ package com.example.shivr.androidblogapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -22,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference mdatabaseReference;
 
+    //for authentication
+    private FirebaseAuth mAuth;
+
+    private FirebaseAuth.AuthStateListener mauthStateListener;
+
+    private Toolbar mToolbar;
 //    private List<Blog> blogList;
 
     @Override
@@ -37,6 +47,45 @@ public class MainActivity extends AppCompatActivity {
         mblog_list_recycleview.setHasFixedSize(true);
         mblog_list_recycleview.setLayoutManager(new LinearLayoutManager(this));
 
+        mToolbar = findViewById(R.id.main_tool_bar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("Android BlogApp");
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mAuth = FirebaseAuth.getInstance();
+
+
+        //to track wheneve the userr signs in or out
+        mauthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                if (user != null) {
+
+                    //user is signed in
+//                    FirebaseUser currentUser = mAuth.getCurrentUser();
+
+                    Intent start_intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(start_intent);
+                    finish();
+
+
+                } else {
+
+                    //user is signed out
+
+                    Intent login_intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                    login_intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(login_intent);
+
+
+                }
+
+            }
+        };
+
 
 //        mdatabaseReference = FirebaseDatabase.getInstance().getReference().child("Blog");
 
@@ -48,10 +97,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //we have to create FirebaseRecyclerAdapter which takes two <Blog,BlogViewHolder>
+        mAuth.addAuthStateListener(mauthStateListener);
 
-        FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>
-                (Blog.class,R.layout.blog_row,BlogViewHolder.class,mdatabaseReference) {
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//
+//        if (currentUser==null){
+//
+//            Intent start_intent = new Intent(MainActivity.this,WelcomeActivity.class);
+//            startActivity(start_intent);
+//            finish();
+//        }
+
+
+        //we have to create FirebaseRecyclerAdapter which takes two <Blog,BlogViewHolder>
+        //these helps us to retrieve the data directly from the database
+
+        FirebaseRecyclerAdapter<Blog, BlogViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>
+                (Blog.class, R.layout.blog_row, BlogViewHolder.class, mdatabaseReference) {
             @Override
             protected void populateViewHolder(BlogViewHolder viewHolder, Blog model, int position) {
 
@@ -69,9 +131,9 @@ public class MainActivity extends AppCompatActivity {
 
     //we have to create BlogViewHolder which extends from RecyclerView.ViewHolder
 
-    public static class BlogViewHolder extends RecyclerView.ViewHolder{
+    public static class BlogViewHolder extends RecyclerView.ViewHolder {
 
-//        TextView textView_title;
+        //        TextView textView_title;
 //        TextView textView_decription;
         View mview;
 
@@ -84,18 +146,18 @@ public class MainActivity extends AppCompatActivity {
 //            textView_decription = itemView.findViewById(R.id.post_descr);
         }
 
-        public void setTitle(String title){
+        public void setTitle(String title) {
 
             TextView textView_title = itemView.findViewById(R.id.post_title);
             textView_title.setText(title);
         }
 
-        public void setDesc(String desc){
+        public void setDesc(String desc) {
             TextView textView_decription = itemView.findViewById(R.id.post_descr);
             textView_decription.setText(desc);
         }
 
-        public void setImage(String image){
+        public void setImage(String image) {
 
             ImageView post_imageview = itemView.findViewById(R.id.post_image);
 
@@ -109,17 +171,25 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         //this is used to create + icon in the toolbar
-        getMenuInflater().inflate(R.menu.main_menu,menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId()==R.id.action_add){
+        if (item.getItemId() == R.id.action_add) {
 
-            Intent intent = new Intent(MainActivity.this,PostActivity.class);
+            Intent intent = new Intent(MainActivity.this, PostActivity.class);
             startActivity(intent);
+        }
+
+        if (item.getItemId() == R.id.action_logout) {
+
+            FirebaseAuth.getInstance().signOut();
+            Intent start_intent = new Intent(MainActivity.this, WelcomeActivity.class);
+            startActivity(start_intent);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

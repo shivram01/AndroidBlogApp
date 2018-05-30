@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "711919314121",
+    "firebase_url": "https://androidblogapp-cf6f4.firebaseio.com",
+    "project_id": "androidblogapp-cf6f4",
+    "storage_bucket": "androidblogapp-cf6f4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711919314121:android:754f9242070c9df0",
+        "android_client_info": {
+          "package_name": "com.example.shivr.androidblogapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "711919314121-kbnm337h750i5b53i4npaaabuqiroh84.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "711919314121-kbnm337h750i5b53i4npaaabuqiroh84.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA97rgo5d6Z_g2ok7YFqyQ_iuDg3r4SDDI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        //we have to create FirebaseRecyclerAdapter which takes two <Blog,BlogViewHolder>
+
         FirebaseRecyclerAdapter<Blog,BlogViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>
                 (Blog.class,R.layout.blog_row,BlogViewHolder.class,mdatabaseReference) {
             @Override
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //we have to create BlogViewHolder which extends from RecyclerView.ViewHolder
 
     public static class BlogViewHolder extends RecyclerView.ViewHolder{
 

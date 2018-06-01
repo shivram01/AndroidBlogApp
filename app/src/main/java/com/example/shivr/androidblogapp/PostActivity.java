@@ -16,8 +16,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -50,6 +55,14 @@ public class PostActivity extends AppCompatActivity {
 
     private Uri downloadUrl;
 
+    private FirebaseAuth mAuth;
+
+    //this helps us to get the current user
+    private FirebaseUser current_user;
+
+    //these database for the user
+    private DatabaseReference mdatbase_user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +77,10 @@ public class PostActivity extends AppCompatActivity {
         msubmit_button = findViewById(R.id.sumbit_button);
 
 
+        mAuth = FirebaseAuth.getInstance();
+
+        current_user = mAuth.getCurrentUser();
+
         progressDialog = new ProgressDialog(this);
 
         //get the instance of the storagereference
@@ -72,6 +89,8 @@ public class PostActivity extends AppCompatActivity {
 
         //get the instance of the Databaserefernece
         mdatabaseReference = FirebaseDatabase.getInstance().getReference().child("Blog");
+
+        mdatbase_user = FirebaseDatabase.getInstance().getReference().child("Users").child(current_user.getUid());
 
         mselect_image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,8 +116,8 @@ public class PostActivity extends AppCompatActivity {
                 progressDialog.setMessage("Posting to Blog....");
                 progressDialog.show();
 
-                String title_post = mpost_title.getText().toString();
-                String descr_post = mpost_description.getText().toString();
+                final String title_post = mpost_title.getText().toString();
+                final String descr_post = mpost_description.getText().toString();
 
                 if (TextUtils.isEmpty(title_post) || TextUtils.isEmpty(descr_post )||(mselect_image==null)){
                     Toast.makeText(PostActivity.this,"Please complete the field",Toast.LENGTH_LONG).show();
@@ -107,15 +126,48 @@ public class PostActivity extends AppCompatActivity {
 
                     //now to store title and description in the database we have to make the DatbaseReference
 
-                    DatabaseReference new_post = mdatabaseReference.push();
+                    final DatabaseReference new_post = mdatabaseReference.push();
+//
+//                    new_post.child("Name").setValue(title_post);
+//                    new_post.child("Description").setValue(descr_post);
+//                    new_post.child("image").setValue(downloadUrl.toString());
 
-                    new_post.child("Name").setValue(title_post);
-                    new_post.child("Description").setValue(descr_post);
-                    new_post.child("image").setValue(downloadUrl.toString());
+                    //to read from our database
 
-                    Toast.makeText(PostActivity.this,"Sucessfully Posted",Toast.LENGTH_LONG).show();
+                    mdatbase_user.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    startActivity(new Intent(PostActivity.this,MainActivity.class));
+                            new_post.child("Name").setValue(title_post);
+                            new_post.child("Description").setValue(descr_post);
+                            new_post.child("image").setValue(downloadUrl.toString());
+
+                            //
+                            new_post.child("uid").setValue(current_user.getUid());
+
+                            //the datasnapshot returns all the child of the Users
+                            new_post.child("username").setValue(dataSnapshot.child("Name").getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                    if (task.isSuccessful()){
+
+                                        startActivity(new Intent(PostActivity.this,MainActivity.class));
+                                        Toast.makeText(PostActivity.this,"Sucessfully Posted",Toast.LENGTH_LONG).show();
+                                    }else {
+
+                                        String error_post = task.getException().getMessage();
+                                        Toast.makeText(PostActivity.this,"Error " + error_post,Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
                     progressDialog.dismiss();
 
@@ -163,7 +215,7 @@ public class PostActivity extends AppCompatActivity {
             progressDialog.show();
 
 
-            //these two line of code will just take the images and display to the user
+            //these ine of code will just take the images and display to the user
 
             Uri download_uri = data.getData();
 //

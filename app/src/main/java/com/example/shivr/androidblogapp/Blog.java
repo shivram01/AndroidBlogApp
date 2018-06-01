@@ -7,15 +7,17 @@ package com.example.shivr.androidblogapp;
 public class Blog {
 
     //the variable filed name should be exactly same as in the firebase database
-    String Name, Description, image;
+    String Name, Description, image, username;
 
     public Blog() {
     }
 
-    public Blog(String title, String descr, String image) {
+    public Blog(String title, String descr, String image, String username) {
         this.Name = title;
         this.Description = descr;
         this.image = image;
+        this.username = username;
+
     }
 
     public String getTitle() {
@@ -40,5 +42,13 @@ public class Blog {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

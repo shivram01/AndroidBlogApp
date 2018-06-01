@@ -10,14 +10,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +36,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mauthStateListener;
 
     private Toolbar mToolbar;
-//    private List<Blog> blogList;
+
+    //for likes make boolean
+    private boolean mprocess_likes = false;
+
+    //database for likes
+    private DatabaseReference mdatabase_likes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         //this helps us to get the child of the database
         mdatabaseReference = FirebaseDatabase.getInstance().getReference().child("Blog");
+
+        //for the likes database reference
+        mdatabase_likes = FirebaseDatabase.getInstance().getReference().child("Likes");
 
         //these is used to set the recycler
         mblog_list_recycleview = findViewById(R.id.blog_list_recyclerview);
@@ -55,32 +67,18 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
 
-        //to track wheneve the userr signs in or out
+        //to track the user had signed in or out
         mauthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+//                FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                if (user != null) {
-
-                    //user is signed in
-//                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                if (firebaseAuth.getCurrentUser() == null) {
 
                     Intent start_intent = new Intent(MainActivity.this, MainActivity.class);
                     startActivity(start_intent);
                     finish();
-
-
-                } else {
-
-                    //user is signed out
-
-                    Intent login_intent = new Intent(MainActivity.this, WelcomeActivity.class);
-                    login_intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(login_intent);
-
-
                 }
 
             }
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mauthStateListener);
 
 //        FirebaseUser currentUser = mAuth.getCurrentUser();
-//
+
 //        if (currentUser==null){
 //
 //            Intent start_intent = new Intent(MainActivity.this,WelcomeActivity.class);
@@ -110,18 +108,77 @@ public class MainActivity extends AppCompatActivity {
 
 
         //we have to create FirebaseRecyclerAdapter which takes two <Blog,BlogViewHolder>
-        //these helps us to retrieve the data directly from the database
+        //these helps us to retrieve the data directly from the database and display into the recycler view
 
         FirebaseRecyclerAdapter<Blog, BlogViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>
                 (Blog.class, R.layout.blog_row, BlogViewHolder.class, mdatabaseReference) {
             @Override
             protected void populateViewHolder(BlogViewHolder viewHolder, Blog model, int position) {
 
+                //to get the position or the key of the imageview
+                final String post_key = getRef(position).getKey();
+
+
                 //these is used to set the title, descr and image
 
                 viewHolder.setTitle(model.getTitle());
                 viewHolder.setDesc(model.getDescr());
                 viewHolder.setImage(model.getImage());
+                viewHolder.setUsername(model.getUsername());
+
+                //for changing the icon of the imagebutton
+                viewHolder.setLikesButton(post_key);
+
+                //these is when the user click on the imageview and it give the post_key
+                viewHolder.mview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Toast.makeText(MainActivity.this, post_key, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+                //now when the likes button is pressed
+
+                viewHolder.mlikes_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        mprocess_likes = true;
+
+                        //to read from the database we used addValueEventListener
+                        mdatabase_likes.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                if (mprocess_likes) {
+
+                                    //these is used to check that like is exist or not if it exist then if condition will run otherwise else condition
+                                    if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())) {
+
+                                        //these helps us to remove the likes when we double click on the likes imagebutton
+                                        mdatabase_likes.child(post_key).child(mAuth.getCurrentUser().getUid()).removeValue();
+                                        mprocess_likes =false;
+
+                                    } else {
+
+                                        //this is used to check the new user came to like
+                                        mdatabase_likes.child(post_key).child(mAuth.getCurrentUser().getUid()).setValue("Random");
+                                        mprocess_likes = false;
+
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+
+                });
             }
         };
 
@@ -133,23 +190,33 @@ public class MainActivity extends AppCompatActivity {
 
     public static class BlogViewHolder extends RecyclerView.ViewHolder {
 
-        //        TextView textView_title;
-//        TextView textView_decription;
         View mview;
+
+        //to store the likes in the database
+        DatabaseReference mdatbaselikes;
+        //for authentication
+        FirebaseAuth mAuth;
+
+        //for likes imagebutton
+        ImageButton mlikes_button;
 
         public BlogViewHolder(View itemView) {
 
             super(itemView);
             mview = itemView;
 
-//            textView_title = itemView.findViewById(R.id.post_title);
-//            textView_decription = itemView.findViewById(R.id.post_descr);
+            mlikes_button = itemView.findViewById(R.id.likes_image_button);
+
+            mdatbaselikes = FirebaseDatabase.getInstance().getReference().child("Likes");
+
+            mAuth = FirebaseAuth.getInstance();
+
         }
 
         public void setTitle(String title) {
 
-            TextView textView_title = itemView.findViewById(R.id.post_title);
-            textView_title.setText(title);
+            TextView textView_post_title = itemView.findViewById(R.id.post_title);
+            textView_post_title.setText(title);
         }
 
         public void setDesc(String desc) {
@@ -163,6 +230,43 @@ public class MainActivity extends AppCompatActivity {
 
             //it is used to load image using the picasso dependency
             Picasso.get().load(image).into(post_imageview);
+
+        }
+
+        public void setUsername(String username) {
+
+            TextView textView_ussername = itemView.findViewById(R.id.post_username);
+            textView_ussername.setText(username);
+
+        }
+
+        //these method is used for changing the icon of the likes
+        public void setLikesButton(final String post_key){
+
+            mdatbaselikes.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    //to check the likes exist or not
+                    if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
+
+                        //if the user exist then the change the icon of the image as red
+
+                        mlikes_button.setImageResource(R.drawable.red);
+
+                    }else {
+
+                        //if the user new then the icon will be gray one
+                        mlikes_button.setImageResource(R.drawable.gray);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
 
         }
     }
@@ -190,6 +294,13 @@ public class MainActivity extends AppCompatActivity {
             Intent start_intent = new Intent(MainActivity.this, WelcomeActivity.class);
             startActivity(start_intent);
             finish();
+        }
+
+        if (item.getItemId() == R.id.action_account_setting) {
+
+            Intent intent = new Intent(MainActivity.this, AccountActivity.class);
+            startActivity(intent);
+
         }
 
         return super.onOptionsItemSelected(item);

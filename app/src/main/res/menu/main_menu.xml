@@ -10,8 +10,14 @@
     <item android:id="@+id/action_setting"
         android:title="setting"
         app:showAsAction="never"/>
+
     <item android:id="@+id/action_logout"
         android:title="logout"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/action_account_setting"
+        android:title="Account Setting"
+        app:showAsAction="never"/>
+
 
 </menu>

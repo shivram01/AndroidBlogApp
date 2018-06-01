@@ -9,6 +9,15 @@
     android:layout_marginTop="20dp"
     tools:context="com.example.shivr.androidblogapp.PostActivity">
 
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <ImageButton
         android:id="@+id/insert_image"
         android:layout_width="match_parent"
@@ -21,20 +30,20 @@
         android:layout_alignParentTop="true" />
 
 
-    <EditText
-        android:id="@+id/mpost_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/insert_image"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:background="@drawable/input_outline"
-        android:padding="15dp"
-        android:hint="Post Tilte..."
-        android:inputType="textPersonName"
-        android:text="" />
+        <EditText
+            android:id="@+id/mpost_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/insert_image"
+            android:layout_marginTop="20dp"
+            android:ems="10"
+            android:background="@drawable/input_outline"
+            android:padding="15dp"
+            android:hint="Post Tilte..."
+            android:inputType="textPersonName"
+            android:text="" />
 
     <EditText
         android:id="@+id/mpost_description"
@@ -59,10 +68,13 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="31dp"
+        android:layout_marginTop="50dp"
         android:background="@color/colorPrimary"
         android:text="submit"
         android:textColor="@color/white" />
 
+    </LinearLayout>
 
+    </ScrollView>
 
 </RelativeLayout>

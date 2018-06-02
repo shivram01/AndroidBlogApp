@@ -31,7 +31,10 @@
             android:name=".LoginActivity"
             android:parentActivityName=".WelcomeActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".AccountActivity"
+        <activity
+            android:name=".AccountActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".BlogSingleActivity"
             android:parentActivityName=".MainActivity"></activity>
     </application>
 

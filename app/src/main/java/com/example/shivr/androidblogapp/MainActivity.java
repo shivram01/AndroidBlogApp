@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -113,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseRecyclerAdapter<Blog, BlogViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Blog, BlogViewHolder>
                 (Blog.class, R.layout.blog_row, BlogViewHolder.class, mdatabaseReference) {
             @Override
-            protected void populateViewHolder(BlogViewHolder viewHolder, Blog model, int position) {
+            protected void populateViewHolder(BlogViewHolder viewHolder, Blog model, final int position) {
 
                 //to get the position or the key of the imageview
                 final String post_key = getRef(position).getKey();
@@ -134,7 +133,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
-                        Toast.makeText(MainActivity.this, post_key, Toast.LENGTH_LONG).show();
+                        Intent single_blog_intent = new Intent(MainActivity.this,BlogSingleActivity.class);
+                        single_blog_intent.putExtra("blog_id",post_key);
+                        startActivity(single_blog_intent);
                     }
                 });
 
@@ -194,8 +195,9 @@ public class MainActivity extends AppCompatActivity {
 
         //to store the likes in the database
         DatabaseReference mdatbaselikes;
-        //for authentication
-        FirebaseAuth mAuth;
+
+        //for authentication particular user likes id
+        FirebaseAuth mAuth_likes_id;
 
         //for likes imagebutton
         ImageButton mlikes_button;
@@ -209,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
             mdatbaselikes = FirebaseDatabase.getInstance().getReference().child("Likes");
 
-            mAuth = FirebaseAuth.getInstance();
+            mAuth_likes_id = FirebaseAuth.getInstance();
 
         }
 
@@ -248,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
                     //to check the likes exist or not
-                    if (dataSnapshot.child(post_key).hasChild(mAuth.getCurrentUser().getUid())){
+                    if (dataSnapshot.child(post_key).hasChild(mAuth_likes_id.getCurrentUser().getUid())){
 
                         //if the user exist then the change the icon of the image as red
 
@@ -290,7 +292,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (item.getItemId() == R.id.action_logout) {
 
+            FirebaseAuth mAuth_logout;
+
             FirebaseAuth.getInstance().signOut();
+
+//            FirebaseAuth.getInstance().signOut();
             Intent start_intent = new Intent(MainActivity.this, WelcomeActivity.class);
             startActivity(start_intent);
             finish();

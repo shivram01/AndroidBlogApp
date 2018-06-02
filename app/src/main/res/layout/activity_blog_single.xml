@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.shivr.androidblogapp.BlogSingleActivity">
+
+
+    <include
+        android:id="@+id/single_post__tool_bar"
+        layout="@layout/app_bar_layout" />
+
+    <ImageView
+        android:id="@+id/post_single_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/add_btn"
+        android:layout_below="@+id/single_post__tool_bar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+    <TextView
+        android:id="@+id/post_single_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="Blog Title Goes Here"
+        android:textColor="@color/Black"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/post_single_image"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+    <TextView
+        android:id="@+id/post_single_descr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Blog descr Goes Here"
+        android:padding="15dp"
+        android:textSize="16sp"
+        android:layout_marginTop="21dp"
+        android:layout_below="@+id/post_single_title"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/remove_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="remove post"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="30dp" />
+
+
+</RelativeLayout>
